@@ -179,14 +179,7 @@ void Pipe_edit(Pipeline& pipe)
 {
     string condition_edit;
 
-    if (pipe.pipe_condition == true)//!!!
-    {
-        cout << "Current status: Yes" << endl;
-    }
-    else
-    {
-        cout << "Current status: No" << endl;
-    }
+    cout << "Current status: " << (pipe.pipe_condition ? "Yes" : "No") << '\n';
 
     while (condition_edit != "No" || condition_edit != "Yes" || condition_edit != "Y" || condition_edit != "N")
     {
