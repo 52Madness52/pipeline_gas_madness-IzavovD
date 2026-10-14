@@ -3,23 +3,28 @@
 #include <fstream>
 #include <limits>
 #include <string>
+#include <vector>
 
 using namespace std;
 
-struct Pipeline
+class Pipeline
 {
+public:
     string pipe_name;
     double pipe_length;
     int pipe_diameter;
+    int id;
     bool pipe_condition;
 };
 
-struct Compressor_station
+class Compressor_station
 {
+public:
     string comp_name;
     int comp_workshops;
     int comp_workshops_working;
     int comp_station_class;
+    int id;
 };
 
 void Get_positive_int(int& value)
@@ -100,6 +105,7 @@ void Menu_print()
 void Pipeline_print(const Pipeline& pipe)
 {
     cout << "----PIPE----" << endl;
+    cout << "ID: " << pipe.id << endl;
     cout << "Pipe name: " << pipe.pipe_name << endl;
     cout << "Pipe length: " << pipe.pipe_length << endl;
     cout << "Pipe diameter: " << pipe.pipe_diameter << endl;
@@ -109,6 +115,7 @@ void Pipeline_print(const Pipeline& pipe)
 void Compressor_print(const Compressor_station& comp)
 {
     cout << "----Compressor Station----" << endl;
+    cout << "ID: " << comp.id << endl;
     cout << "Compressor name: " << comp.comp_name << endl;
     cout << "Number of workshops: " << comp.comp_workshops << endl;
     cout << "Number of working workshops: " << comp.comp_workshops_working << endl;
@@ -317,13 +324,10 @@ bool File_upload(Pipeline& pipe, Compressor_station& comp, bool& Pipeline_add, b
 
 int main()
 {
-    Pipeline pipe{};
-    Compressor_station comp{};
-    
+    vector<Pipeline> pipes;
+    vector<Compressor_station> compressors;
+    int next_id = 1;
     int user_inp = 1;
-    bool Pipeline_add = false;
-    bool Compressor_add = false;
-
     do
     {
         Menu_print();
@@ -341,66 +345,118 @@ int main()
         case 1:
         {
             cout << endl;
-            Pipeline_input(pipe);
-            Pipeline_add = true;
+            Pipeline new_pipe{};
+            Pipeline_input(new_pipe);
+            new_pipe.id = next_id++;
+            pipes.push_back(new_pipe);
+     
             break;
 
         }
         case 2:
         {
             cout << endl;
-            Compressor_input(comp);
-            Compressor_add = true;
+            Compressor_station new_compressor{};
+            Compressor_input(new_compressor);
+            new_compressor.id = next_id++;
+            compressors.push_back(new_compressor);
             break;
         }
         case 3:
         {
-            if (Pipeline_add)
+            if (!pipes.empty())
             {
-                Pipeline_print(pipe);
+                for (const Pipeline& pipe : pipes)
+                {
+                    Pipeline_print(pipe);
+                }
             }
             else
             {
-                cout << "Pipe dont find" << endl << endl;
+                cout << "Pipe dont find" << endl;
             }
-            if (Compressor_add )
+
+            if (!compressors.empty())
             {
-                Compressor_print(comp);
+                for (const Compressor_station& comp : compressors)
+                {
+                    Compressor_print(comp);
+                }
             }
             else
             {
                 cout << "Compressor station dont find" << endl;
             }
-            cout << endl;
             break;
         }
         case 4:
         {
-            if (Pipeline_add == true)
+            int required_id;
+            bool found_id = false;
+            cout << "Enter the ID of the required pipe: ";
+            Get_positive_int(required_id);
+
+            if (!pipes.empty())
             {
-                Pipe_edit(pipe);
+                for (Pipeline& pipe : pipes)
+                {
+                    if (pipe.id == required_id)
+                    {
+                        cout << "Editable Pipe:" << endl;
+                        Pipeline_print(pipe);
+                        Pipe_edit(pipe);
+                        found_id = true;
+                        break;
+
+                    }
+                }
             }
             else
             {
-                cout << "Pipe dont find. You can't edit pipe." << endl;
+                cout << "Pipe dont find" << endl;
             }
-            cout << endl;
-            break;
+            
+            if (!found_id)
+            {
+                cout << "Pipe not found" << endl;
+            }
+            break; 
         }
         case 5:
         {
-            if (Compressor_add == true)
+            int required_id;
+            bool found_id = false;
+
+            cout << "Enter the ID of the required compressor: ";
+            Get_positive_int(required_id);
+            
+            if (!compressors.empty())
             {
-                Compressor_edit(comp);
+                for (Compressor_station& comp : compressors)
+                {
+                    if (comp.id == required_id)
+                    {
+                        cout << "Editable Compressor Station" << endl;
+                        Compressor_print(comp);
+                        Compressor_edit(comp);
+                        found_id = true;
+                        break;
+                    }
+                }
             }
             else
             {
-                cout << "Compressor station dont find. You can't edit Compressor station." << endl;
+                cout << "Compressor station dont find" << endl;
             }
-            cout << endl;
+            
+            
+            if (!found_id)
+            {
+                cout << "Compressor Station not found" << endl;
+            }
             break;
         }
-        case 6:
+        /*case 6:
         {
             if (Pipeline_add || Compressor_add)
             {
@@ -427,7 +483,7 @@ int main()
         {
             cout << "Invalid menu option. Try again" << endl << endl;
             break;
-        }
+        }*/
         }
         
     } while (user_inp != 0);    
