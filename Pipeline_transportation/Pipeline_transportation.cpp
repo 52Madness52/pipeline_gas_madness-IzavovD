@@ -1,31 +1,13 @@
 
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <limits>
-#include <string>
 #include <vector>
-
+#include <unordered_map>
+#include "Pipeline.h"
+#include "Compressor_station.h"
 using namespace std;
-
-class Pipeline
-{
-public:
-    string pipe_name;
-    double pipe_length;
-    int pipe_diameter;
-    int id;
-    bool pipe_condition;
-};
-
-class Compressor_station
-{
-public:
-    string comp_name;
-    int comp_workshops;
-    int comp_workshops_working;
-    int comp_station_class;
-    int id;
-};
 
 void Get_positive_int(int& value)
 {
@@ -105,49 +87,53 @@ void Menu_print()
 void Pipeline_print(const Pipeline& pipe)
 {
     cout << "----PIPE----" << endl;
-    cout << "ID: " << pipe.id << endl;
-    cout << "Pipe name: " << pipe.pipe_name << endl;
-    cout << "Pipe length: " << pipe.pipe_length << endl;
-    cout << "Pipe diameter: " << pipe.pipe_diameter << endl;
-    cout << "Pipe condition: " << pipe.pipe_condition << endl << endl;
+    cout << "ID: " << pipe.Get_id() << endl;
+    cout << "Pipe name: " << pipe.Get_name() << endl;
+    cout << "Pipe length: " << pipe.Get_length() << endl;
+    cout << "Pipe diameter: " << pipe.Get_diameter() << endl;
+    cout << "Pipe condition: " << pipe.Get_condition() << endl << endl;
 }
 
 void Compressor_print(const Compressor_station& comp)
 {
     cout << "----Compressor Station----" << endl;
-    cout << "ID: " << comp.id << endl;
-    cout << "Compressor name: " << comp.comp_name << endl;
-    cout << "Number of workshops: " << comp.comp_workshops << endl;
-    cout << "Number of working workshops: " << comp.comp_workshops_working << endl;
-    cout << "Station class: " << comp.comp_station_class << endl;
+    cout << "ID: " << comp.Get_id() << endl;
+    cout << "Compressor name: " << comp.Get_name() << endl;
+    cout << "Number of workshops: " << comp.Get_workshops() << endl;
+    cout << "Number of working workshops: " << comp.Get_workshops_working() << endl;
+    cout << "Station class: " << comp.Get_station_class() << endl;
 }
 
-void Pipeline_input(Pipeline& pipe)
+Pipeline Pipeline_input(int id)
 {
-    string condition;
+    string name;
+    string condition_input;
+    double length;
+    int diameter;
+    bool condition;
     
     cout << "Enter pipe name: ";
-    getline(cin >> ws, pipe.pipe_name);
+    getline(cin >> ws, name);
 
     cout << "Enter pipe length: ";
-    Get_positive_double(pipe.pipe_length);
+    Get_positive_double(length);
     
     cout << "Enter pipe diameter: ";
-    Get_positive_int(pipe.pipe_diameter);
+    Get_positive_int(diameter);
 
-    while (condition != "No" || condition != "Yes" || condition != "Y" || condition != "N")
+    while (true)
     {
         cout << "Enter pipe condition (Yes/No): ";
-        cin >> condition;
+        cin >> condition_input;
 
-        if (condition == "Yes" || condition == "Y")
+        if (condition_input == "Yes" || condition_input == "Y")
         {
-            pipe.pipe_condition = true;
+            condition = true;
             break;
         }
-        else if (condition == "No" || condition == "N")
+        else if (condition_input == "No" || condition_input == "N")
         {
-            pipe.pipe_condition = false;
+            condition = false;
             break;
         }
         else
@@ -157,49 +143,62 @@ void Pipeline_input(Pipeline& pipe)
     }
 
     cout << endl;
+
+    Pipeline pipe(id, name, length, diameter, condition);
+
+    return pipe;
 }
 
-void Compressor_input(Compressor_station& comp)
+Compressor_station Compressor_input(int id)
 {
+    string name;
+    int workshops;
+    int working_workshops;
+    int station_class;
+
     cout << "Enter compressor name: ";
-    getline(cin >> ws, comp.comp_name);
+    getline(cin >> ws, name);
    
     cout << "Enter number of workshops: ";
-    Get_positive_int(comp.comp_workshops);
+    Get_positive_int(workshops);
     
     cout << "Enter number of working workshops: ";
-    Get_positive_int(comp.comp_workshops_working);
+    Get_positive_int(working_workshops);
 
-    while (comp.comp_workshops < comp.comp_workshops_working)
+    while (workshops < working_workshops)
     {
         cout << "The total number of workshops is less than the number of working workshops. Try again: ";
-        Get_positive_int(comp.comp_workshops_working);
+        Get_positive_int(working_workshops);
     }
     
     cout << "Enter station class: ";
-    Get_positive_int(comp.comp_station_class);
+    Get_positive_int(station_class);
 
     cout << endl;
+
+    Compressor_station comp(id, workshops, working_workshops, station_class, name);
+
+    return comp;
 }
 
 void Pipe_edit(Pipeline& pipe)
 {
     string condition_edit;
 
-    cout << "Current status: " << (pipe.pipe_condition ? "Yes" : "No") << '\n';
+    cout << "Current status: " << (pipe.Get_condition() ? "Yes" : "No") << '\n';
 
-    while (condition_edit != "No" || condition_edit != "Yes" || condition_edit != "Y" || condition_edit != "N")
+    while (true)
     {
         cout << "Enter the new status condition (Yes/No): ";
         cin >> condition_edit;
         if (condition_edit == "Yes" || condition_edit == "Y")
         {
-            pipe.pipe_condition = true;
+            pipe.Set_condition(true);
             break;
         }
         else if (condition_edit == "No" || condition_edit == "N")
         {
-            pipe.pipe_condition = false;
+            pipe.Set_condition(false);
             break;
         }
         else
@@ -214,8 +213,8 @@ void Pipe_edit(Pipeline& pipe)
 void Compressor_edit(Compressor_station& comp)
 {
     int user_inp; //!!!
-    cout << "Total workshops:" << comp.comp_workshops << endl;
-    cout << "Working workshops:" << comp.comp_workshops_working << endl;
+    cout << "Total workshops:" << comp.Get_workshops() << endl;
+    cout << "Working workshops:" << comp.Get_workshops_working() << endl;
 
     cout << "What do you want to do ?" << endl;
     cout << "1.Start a workshop" << endl;
@@ -225,13 +224,19 @@ void Compressor_edit(Compressor_station& comp)
     Get_positive_int(user_inp);
     
 
-    if (user_inp == 1 && (comp.comp_workshops_working < comp.comp_workshops))
+    if (user_inp == 1 && (comp.Get_workshops_working() < comp.Get_workshops()))
     {
-        cout << "New number of working workshops:" << ++comp.comp_workshops_working << endl;
+        comp.Set_workshops(comp.Get_workshops_working() + 1);
+
+        cout << "New number of working workshops: "
+            << comp.Get_workshops_working() << endl;
     }
-    else if (user_inp == 2 && comp.comp_workshops_working != 0)
+    else if (user_inp == 2 && comp.Get_workshops_working() != 0)
     {
-        cout << "New number of working workshops:" << --comp.comp_workshops_working << endl;
+        comp.Set_workshops(comp.Get_workshops_working() - 1);
+
+        cout << "New number of working workshops: "
+            << comp.Get_workshops_working() << endl;
     }
     else
     {
@@ -311,6 +316,7 @@ bool File_upload(Pipeline& pipe, Compressor_station& comp, bool& Pipeline_add, b
         Upload_Pipeline(file, pipe);
     
 
+
     file >> Compressor_add;
 
     if (Compressor_add)//!!!
@@ -324,8 +330,8 @@ bool File_upload(Pipeline& pipe, Compressor_station& comp, bool& Pipeline_add, b
 
 int main()
 {
-    vector<Pipeline> pipes;
-    vector<Compressor_station> compressors;
+    unordered_map<int, Pipeline > pipes;
+    unordered_map<int, Compressor_station > pipes;
     int next_id = 1;
     int user_inp = 1;
     do

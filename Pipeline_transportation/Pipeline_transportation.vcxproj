@@ -139,7 +139,13 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Compressor_station.cpp" />
+    <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="Pipeline_transportation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Compressor_station.h" />
+    <ClInclude Include="Pipeline.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
