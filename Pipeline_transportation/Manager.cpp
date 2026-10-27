@@ -283,7 +283,7 @@ void manageCompressors(
         {
             if (comp.Get_workshops_working() < comp.Get_workshops())
             {
-                comp.Set_workshops(comp.Get_workshops_working() + 1);
+                comp.Set_workings_workshops(comp.Get_workshops_working() + 1);
 
                 cerr << "Compressor station ID " << id
                     << ": workshop started" << endl;
@@ -303,7 +303,7 @@ void manageCompressors(
         {
             if (comp.Get_workshops_working() > 0)
             {
-                comp.Set_workshops(comp.Get_workshops_working() - 1);
+                comp.Set_workings_workshops(comp.Get_workshops_working() - 1);
 
                 cerr << "Compressor station ID " << id
                     << ": workshop stopped" << endl;

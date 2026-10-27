@@ -1,126 +1,47 @@
 #include "Pipeline.h"
 #include "Compressor_station.h"
 #include "Utils.h"
+#include "Manager.h"
+#include "FileManager.h"
+
 #include <iostream>
-#include <string>
 #include <fstream>
-#include <vector>
+#include <string>
 #include <unordered_map>
 
 using namespace std;
 
 void Menu_print()
 {
-    cout << "1.Add pipe" << endl;
-    cout << "2.Add compressor station" << endl;
-    cout << "3.View all items" << endl;
-    cout << "4.Edit pipe" << endl;
-    cout << "5.Edit compressor station" << endl;
-    cout << "6.Save" << endl;
-    cout << "7.Upload" << endl;
-    cout << "0.Exit" << endl << endl;
+    cout << "\n===== MAIN MENU =====" << endl;
+    cout << "1. Add pipe" << endl;
+    cout << "2. Add compressor station" << endl;
+    cout << "3. View all items" << endl;
+    cout << "4. Search and manage objects" << endl;
+    cout << "5. Save to file" << endl;
+    cout << "6. Load from file" << endl;
+    cout << "0. Exit" << endl << endl;
 }
-
-void Save_Pipeline(ofstream& file, Pipeline& pipe)
-{
-    file << pipe.pipe_name << endl;
-    file << pipe.pipe_length << endl;
-    file << pipe.pipe_diameter << endl;
-    file << pipe.pipe_condition << endl;
-}
-
-void Save_Compressor(ofstream& file, Compressor_station& comp)
-{
-    file << comp.comp_name << endl;
-    file << comp.comp_workshops << endl;
-    file << comp.comp_workshops_working << endl;
-    file << comp.comp_station_class << endl;
-}
-
-void Upload_Pipeline(ifstream& file, Pipeline& pipe)
-{
-    getline(file >> ws, pipe.pipe_name);
-    file >> pipe.pipe_length;
-    file >> pipe.pipe_diameter;
-    file >> pipe.pipe_condition;
-}
-
-void Upload_Compressor(ifstream& file, Compressor_station& comp)
-{
-    getline(file >> ws, comp.comp_name);
-    file >> comp.comp_workshops;
-    file >> comp.comp_workshops_working;
-    file >> comp.comp_station_class;
-}
-
-void File_save( Pipeline& pipe, Compressor_station& comp, bool Pipeline_add, bool Compressor_add)
-{
-    ofstream file("data_pipe_comp.txt");
-
-    if (!file.is_open())
-    {
-        cout << "Error: cannot open file.";
-        return;
-    }
-
-    file << Pipeline_add << endl;
-
-    if (Pipeline_add)//!!
-        Save_Pipeline(file, pipe);
-        
-
-    file << Compressor_add << endl;
-
-    if (Compressor_add)//!!
-        Save_Compressor(file, comp);
-
-    file.close();
-}
-
-bool File_upload(Pipeline& pipe, Compressor_station& comp, bool& Pipeline_add, bool& Compressor_add)
-{
-    ifstream file("data_pipe_comp.txt");
-
-    if (!file.is_open())
-    {
-        cout << "Error: file not found." << endl;
-        return false;
-    }
-
-    file >> Pipeline_add;
-
-    if (Pipeline_add)//!!
-        Upload_Pipeline(file, pipe);
-    
-
-
-    file >> Compressor_add;
-
-    if (Compressor_add)//!!!
-        Upload_Compressor(file, comp);
-    
-    file.close();
-
-    return true;
-}
-
 
 int main()
 {
-    ofstream file("log.txt", ios::app);
-
-    redirect_output_wrapper redirect1(cerr);
-    if (file.is_open())
-    {
-        redirect1.redirect(file);
-    }
-
-    cerr << "Test logging" << endl;
-
-
-
     unordered_map<int, Pipeline> pipes;
     unordered_map<int, Compressor_station> compressors;
+
+    std::ofstream logfile("log.txt", std::ios::app);
+
+    redirect_output_wrapper redirect(std::cerr);
+
+    if (logfile.is_open())
+    {
+        redirect.redirect(logfile);
+    }
+    else
+    {
+        std::cout << "Warning: log file cannot be opened." << std::endl;
+    }
+
+    std::cerr << "PROGRAM START" << std::endl;
 
     int user_inp = 1;
     do
@@ -139,40 +60,26 @@ int main()
         }
         case 1:
         {
-
-            cout << endl;
             Pipeline pipe;
             pipe.input();
-            auto result = pipes.emplace(pipe.Get_id(), pipe);
 
-            if (result.second)
-            {
-                cout << "Pipe added (ID " << pipe.Get_id() << ")" << endl;
-                next_id++;
-            }
-            else
-            {
-                cout << "Error: Pipe ID already exists" << endl;
-            }
+            pipes.emplace(pipe.Get_id(), pipe);
+
+            cout << "Pipe added. ID: " << pipe.Get_id() << endl;
+            cerr << "Added pipe ID: " << pipe.Get_id() << endl;
+
             break;
         }
+
         case 2:
         {
-
-            cout << endl;
-            Compressor_station comp(next_id);
+            Compressor_station comp;
             comp.input();
-            auto result = compressors.emplace(next_id, comp);
-            comp.Set_workshops(1000000000);//!!!!!!!!!!!!
-            if (result.second)
-            {
-                cout << "Compressor station added (ID " << comp.Get_id() << ")" << endl;
-                next_id++;
-            }
-            else
-            {
-                cout << "Error: Compressor station ID already exists" << endl;
-            }
+
+            compressors.emplace(comp.Get_id(), comp);
+
+            cout << "Compressor added. ID: " << comp.Get_id() << endl;
+            cerr << "Added compressor ID: " << comp.Get_id() << endl;
 
             break;
         }
@@ -208,99 +115,57 @@ int main()
         }
         case 4:
         {
-            int required_id;
-            bool found_id = false;
-            cout << "Enter the ID of the required pipe: ";
-            Get_positive_int(required_id);
+            int type;
 
-            if (!pipes.empty())
+            do
             {
-                for (Pipeline& pipe : pipes)
-                {
-                    if (pipe.id == required_id)
-                    {
-                        cout << "Editable Pipe:" << endl;
-                        Pipeline_print(pipe);
-                        Pipe_edit(pipe);
-                        found_id = true;
-                        break;
+                cout << "1. Manage pipes" << endl;
+                cout << "2. Manage compressors" << endl;
+                cout << "0. Back" << endl;
+                cout << "Enter: ";
 
-                    }
-                }
-            }
-            else
+                Get_positive_int(type);
+
+            } while (type > 2);
+
+            if (type == 1)
             {
-                cout << "Pipe dont find" << endl;
+                managePipes(pipes);
             }
-            
-            if (!found_id)
+            else if (type == 2)
             {
-                cout << "Pipe not found" << endl;
+                manageCompressors(compressors);
             }
-            break; 
+
+            break;
         }
         case 5:
         {
-            int required_id;
-            bool found_id = false;
+            string filename;
 
-            cout << "Enter the ID of the required compressor: ";
-            Get_positive_int(required_id);
-            
-            if (!compressors.empty())
-            {
-                for (Compressor_station& comp : compressors)
-                {
-                    if (comp.id == required_id)
-                    {
-                        cout << "Editable Compressor Station" << endl;
-                        Compressor_print(comp);
-                        Compressor_edit(comp);
-                        found_id = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                cout << "Compressor station dont find" << endl;
-            }
-            
-            
-            if (!found_id)
-            {
-                cout << "Compressor Station not found" << endl;
-            }
+            cout << "Enter filename to save: ";
+            INPUT_LINE(cin, filename);
+
+            FileManager::Save(filename, pipes, compressors);
+
             break;
         }
-        /*case 6:
+        case 6:
         {
-            if (Pipeline_add || Compressor_add)
-            {
-                File_save(pipe, comp, Pipeline_add, Compressor_add);
-                cout << "Data saved successfully." << endl;
-            }
-            else
-            {
-                cout << "Error: no objects have been created yet." << endl;
-            }
-            cout << endl;
-            break;
-        }
-        case 7:
-        {
-            if (File_upload(pipe, comp, Pipeline_add, Compressor_add))
-            {
-                cout << "Data loaded" << endl;
-            }
-            cout << endl;
+            string filename;
+
+            cout << "Enter filename to load: ";
+            INPUT_LINE(cin, filename);
+
+            FileManager::Load(filename, pipes, compressors);
+
             break;
         }
         default:
         {
             cout << "Invalid menu option. Try again" << endl << endl;
             break;
-        }*/
+        }
         }
         
     } while (user_inp != 0);    

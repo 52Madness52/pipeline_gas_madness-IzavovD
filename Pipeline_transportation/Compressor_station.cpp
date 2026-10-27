@@ -47,7 +47,7 @@ std::string Compressor_station::Get_name() const
     return comp_name;
 }
 
-void Compressor_station::Set_workings(int working_workshops)
+void Compressor_station::Set_workings_workshops(int working_workshops)
 {
     comp_workshops_working = working_workshops;//!!!!
 }
@@ -102,14 +102,14 @@ void Compressor_station::edit()
 
     if (user_inp == 1 && (comp_workshops_working < comp_workshops))
     {
-        Set_workings(comp_workshops_working + 1);
+        Set_workings_workshops(comp_workshops_working + 1);
 
         cout << "New number of working workshops: "
             << comp_workshops_working << endl;
     }
     else if (user_inp == 2 && comp_workshops_working != 0)
     {
-        Set_workings(comp_workshops_working - 1);
+        Set_workings_workshops(comp_workshops_working - 1);
 
         cout << "New number of working workshops: "
             << comp_workshops_working << endl;

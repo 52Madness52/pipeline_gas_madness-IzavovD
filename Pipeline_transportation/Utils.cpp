@@ -86,7 +86,7 @@ vector<int> findPipes(const unordered_map<int, Pipeline>& pipes)
         cout << "Enter only 1 or 2: ";
         Get_positive_int(choice);
     }
-    
+
     if (choice == 1)
     {
         string query;
@@ -124,6 +124,8 @@ vector<int> findPipes(const unordered_map<int, Pipeline>& pipes)
             }
         }
     }
+    return foundIds;
+}
 
 vector<int> findCompressors(const unordered_map<int, Compressor_station>& compressors)
 {

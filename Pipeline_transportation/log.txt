@@ -1,0 +1,40 @@
+PROGRAM START
+1
+Liverpool
+100
+200
+Yes
+Added pipe ID: 1
+2
+Arsenal
+20
+10
+5
+Added compressor ID: 1
+3
+1
+LiverpoolArs
+100
+240
+No
+Added pipe ID: 2
+1
+LiverpoolArsen
+125
+300
+No
+Added pipe ID: 3
+3
+4
+1
+1
+Liverpool
+3
+1
+1
+Pipe ID 1: deleted
+Pipe ID 2: deleted
+Pipe ID 3: deleted
+3
+0
+PROGRAM START

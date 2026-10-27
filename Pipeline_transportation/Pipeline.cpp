@@ -78,7 +78,7 @@ void Pipeline::input()
 
     while (true)
     {
-        cout << "Pipe condition: " << (pipe_condition ? "Yes" : "No") << endl;
+        cout << "Pipe condition (Yes/No): ";
         INPUT_LINE(cin, condition_input);
 
         if (condition_input == "Yes" || condition_input == "Y")
