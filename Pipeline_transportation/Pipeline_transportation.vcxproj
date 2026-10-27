@@ -140,11 +140,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Compressor_station.cpp" />
+    <ClCompile Include="FileManager.cpp" />
+    <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="Pipeline_transportation.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Compressor_station.h" />
+    <ClInclude Include="FileManager.h" />
+    <ClInclude Include="Manager.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Pipeline.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

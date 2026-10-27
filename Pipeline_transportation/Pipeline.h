@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iosfwd>
 
 class Pipeline
 {
@@ -9,9 +10,14 @@ private:
     double pipe_length = 0;
     int pipe_diameter = 0;
     bool pipe_condition = false;
+
+    static int next_id;
 public:
-    Pipeline(int new_id, const std::string& name,
-        double length, int diameter, bool condition);
+    friend std::ostream& operator<<(std::ostream& out, const Pipeline& pipe);
+    friend std::istream& operator>>(std::istream& in,Pipeline& pipe);
+    Pipeline();
+    Pipeline(const std::string& name, double length,
+        int diameter, bool condition);
 
     std::string Get_name() const;
     double Get_length() const;
@@ -20,5 +26,9 @@ public:
     bool Get_condition() const;
 
     void Set_condition(bool condition);
+
+    void print() const;//!!
+    void input();
+    void edit();
 
 };
