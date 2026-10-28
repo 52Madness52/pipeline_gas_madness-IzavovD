@@ -47,9 +47,15 @@ std::string Compressor_station::Get_name() const
     return comp_name;
 }
 
-void Compressor_station::Set_workings_workshops(int working_workshops)
+bool Compressor_station::Set_workings_workshops(int working_workshops)
 {
-    comp_workshops_working = working_workshops;//!!!!
+    if (working_workshops < 0 || working_workshops > comp_workshops)
+    {
+        return false;
+    }
+
+    comp_workshops_working = working_workshops;
+    return true;
 }
 
 void Compressor_station::print() const

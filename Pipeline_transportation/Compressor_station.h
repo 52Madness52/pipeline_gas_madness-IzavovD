@@ -25,7 +25,7 @@ public:
     int Get_station_class() const;
     std::string Get_name() const;
 
-    void Set_workings_workshops(int working_workshops);//!!!
+    bool Set_workings_workshops(int working_workshops);;//!!!
 
     void print() const;
     void input();
