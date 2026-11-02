@@ -58,7 +58,6 @@ bool FileManager::Save(
     }
 
     std::cout << "Data saved successfully." << std::endl;
-    std::cerr << "Saved data to " << filename << std::endl;
 
     return true;
 }
@@ -148,7 +147,6 @@ bool FileManager::Load(
     compressors.swap(loadedCompressors);
 
     std::cout << "Data loaded successfully." << std::endl;
-    std::cerr << "Loaded data from " << filename << std::endl;
 
     return true;
 }

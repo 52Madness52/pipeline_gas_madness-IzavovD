@@ -23,6 +23,8 @@ public:
     int Get_workshops() const;
     int Get_workshops_working() const;
     int Get_station_class() const;
+    double Get_inactive_percent() const;
+
     std::string Get_name() const;
 
     bool Set_workings_workshops(int working_workshops);;//!!!

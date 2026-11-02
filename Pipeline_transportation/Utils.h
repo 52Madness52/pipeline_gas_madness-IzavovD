@@ -3,11 +3,12 @@
 #include "Compressor_station.h"
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <string>
 
-#define INPUT_LINE(in, str) getline(in>>std::ws, str); \
-						std::cerr << str << std::endl
+#define INPUT_LINE(in, str) getline(in >> std::ws, str); \
+                            std::cerr << str << std::endl
 
 #define PRINT_PARAM(out, x) out<< #x << "=" << x << std::endl
 
@@ -30,8 +31,9 @@ public:
 	}
 };
 
-std::vector<int> findPipes(const std::unordered_map<int, Pipeline>& pipes);
-std::vector<int> findCompressors(const std::unordered_map<int, Compressor_station>& compressors);
+
+std::unordered_set<int> findPipes(const std::unordered_map<int, Pipeline>& pipes);
+std::unordered_set<int> findCompressors(const std::unordered_map<int, Compressor_station>& compressors);
 
 void Get_positive_int(int& value);
 void Get_positive_double(double& value);

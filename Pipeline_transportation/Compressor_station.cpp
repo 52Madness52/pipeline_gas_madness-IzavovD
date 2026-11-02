@@ -47,6 +47,18 @@ std::string Compressor_station::Get_name() const
     return comp_name;
 }
 
+double Compressor_station::Get_inactive_percent() const
+{
+    if (comp_workshops == 0)
+    {
+        return 0.0;
+    }
+
+    return 100.0 * (comp_workshops - comp_workshops_working)
+        / comp_workshops;
+}
+
+
 bool Compressor_station::Set_workings_workshops(int working_workshops)
 {
     if (working_workshops < 0 || working_workshops > comp_workshops)

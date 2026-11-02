@@ -1,3 +1,4 @@
+
 #include "Pipeline.h"
 #include "Compressor_station.h"
 #include "Utils.h"
@@ -8,8 +9,11 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <format>
+#include <chrono>
 
 using namespace std;
+
 
 void Menu_print()
 {
@@ -23,30 +27,34 @@ void Menu_print()
     cout << "0. Exit" << endl << endl;
 }
 
+
 int main()
 {
     unordered_map<int, Pipeline> pipes;
     unordered_map<int, Compressor_station> compressors;
 
-    std::ofstream logfile("log.txt", std::ios::app);
+    string time = format("{:%d_%m_%Y_%H_%M_%S}",
+        chrono::system_clock::now());
 
-    redirect_output_wrapper redirect(std::cerr);
+    ofstream logfile("log_" + time + ".txt");
 
-    if (logfile.is_open())
+    redirect_output_wrapper cerr_out(cerr);
+
+    if (logfile)
     {
-        redirect.redirect(logfile);
+        cerr_out.redirect(logfile);
     }
     else
     {
-        std::cout << "Warning: log file cannot be opened." << std::endl;
+        cout << "Warning: log file cannot be opened." << endl;
     }
 
-    std::cerr << "PROGRAM START" << std::endl;
-
     int user_inp = 1;
+
     do
     {
         Menu_print();
+
         cout << "Enter: ";
         Get_positive_int(user_inp);
 
@@ -58,6 +66,7 @@ int main()
             cout << "Program terminated." << endl;
             break;
         }
+
         case 1:
         {
             Pipeline pipe;
@@ -65,8 +74,8 @@ int main()
 
             pipes.emplace(pipe.Get_id(), pipe);
 
-            cout << "Pipe added. ID: " << pipe.Get_id() << endl;
-            cerr << "Added pipe ID: " << pipe.Get_id() << endl;
+            cout << "Pipe added. ID: "
+                << pipe.Get_id() << endl;
 
             break;
         }
@@ -78,14 +87,15 @@ int main()
 
             compressors.emplace(comp.Get_id(), comp);
 
-            cout << "Compressor added. ID: " << comp.Get_id() << endl;
-            cerr << "Added compressor ID: " << comp.Get_id() << endl;
+            cout << "Compressor added. ID: "
+                << comp.Get_id() << endl;
 
             break;
         }
+
         case 3:
         {
-            /// Pipeline
+            // Pipeline
             if (!pipes.empty())
             {
                 for (const auto& [id, pipe] : pipes)
@@ -98,7 +108,7 @@ int main()
                 cout << "No pipes have been added yet." << endl;
             }
 
-            ///Compressor_station
+            // Compressor stations
             if (!compressors.empty())
             {
                 for (const auto& [id, comp] : compressors)
@@ -108,11 +118,13 @@ int main()
             }
             else
             {
-                cout << "No compressor stations have been added yet." << endl;
+                cout << "No compressor stations have been added yet."
+                    << endl;
             }
 
             break;
         }
+
         case 4:
         {
             int type;
@@ -125,6 +137,11 @@ int main()
                 cout << "Enter: ";
 
                 Get_positive_int(type);
+
+                if (type > 2)
+                {
+                    cout << "Invalid menu option. Try again." << endl;
+                }
 
             } while (type > 2);
 
@@ -139,6 +156,7 @@ int main()
 
             break;
         }
+
         case 5:
         {
             string filename;
@@ -150,6 +168,7 @@ int main()
 
             break;
         }
+
         case 6:
         {
             string filename;
@@ -161,13 +180,16 @@ int main()
 
             break;
         }
+
         default:
         {
-            cout << "Invalid menu option. Try again" << endl << endl;
+            cout << "Invalid menu option. Try again"
+                << endl << endl;
             break;
         }
         }
-        
-    } while (user_inp != 0);    
 
+    } while (user_inp != 0);
+
+    return 0;
 }
