@@ -1,5 +1,6 @@
 #include "Pipeline.h"
 #include "Utils.h"
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -13,8 +14,11 @@ Pipeline::Pipeline()
     id = next_id++;
 }
 
-Pipeline::Pipeline(const std::string& name, double length,
-    int diameter, bool condition)
+Pipeline::Pipeline(
+    const std::string& name,
+    double length,
+    int diameter,
+    bool condition)
 {
     id = next_id++;
     pipe_name = name;
@@ -71,10 +75,10 @@ void Pipeline::input()
     INPUT_LINE(cin, pipe_name);
 
     cout << "Enter pipe length: ";
-    Get_positive_double(pipe_length);
+    pipe_length = GetCorrectNumber(0.0);
 
     cout << "Enter pipe diameter: ";
-    Get_positive_int(pipe_diameter);
+    pipe_diameter = GetCorrectNumber(0);
 
     while (true)
     {
@@ -104,7 +108,8 @@ void Pipeline::edit()
 {
     string condition_edit;
 
-    cout << "Current status: " << (pipe_condition ? "Yes" : "No") << '\n';
+    cout << "Current status: "
+        << (pipe_condition ? "Yes" : "No") << '\n';
 
     while (true)
     {

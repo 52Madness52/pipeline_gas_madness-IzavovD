@@ -1,5 +1,6 @@
 #include "Compressor_station.h"
 #include "Utils.h"
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -13,7 +14,11 @@ Compressor_station::Compressor_station()
     id = next_id++;
 }
 
-Compressor_station::Compressor_station(int workshops,int working_workshops, int station_class, const std::string& name)
+Compressor_station::Compressor_station(
+    int workshops,
+    int working_workshops,
+    int station_class,
+    const std::string& name)
 {
     id = next_id++;
     comp_workshops = workshops;
@@ -22,7 +27,7 @@ Compressor_station::Compressor_station(int workshops,int working_workshops, int 
     comp_name = name;
 }
 
-int Compressor_station:: Get_id() const
+int Compressor_station::Get_id() const
 {
     return id;
 }
@@ -58,7 +63,6 @@ double Compressor_station::Get_inactive_percent() const
         / comp_workshops;
 }
 
-
 bool Compressor_station::Set_workings_workshops(int working_workshops)
 {
     if (working_workshops < 0 || working_workshops > comp_workshops)
@@ -76,7 +80,8 @@ void Compressor_station::print() const
     cout << "ID: " << id << endl;
     cout << "Compressor name: " << comp_name << endl;
     cout << "Number of workshops: " << comp_workshops << endl;
-    cout << "Number of working workshops: " << comp_workshops_working << endl;
+    cout << "Number of working workshops: "
+        << comp_workshops_working << endl;
     cout << "Station class: " << comp_station_class << endl;
 }
 
@@ -86,39 +91,38 @@ void Compressor_station::input()
     INPUT_LINE(cin, comp_name);
 
     cout << "Enter number of workshops: ";
-    Get_positive_int(comp_workshops);
+    comp_workshops = GetCorrectNumber(0);
 
     cout << "Enter number of working workshops: ";
-    Get_positive_int(comp_workshops_working);
+    comp_workshops_working = GetCorrectNumber(0);
 
     while (comp_workshops < comp_workshops_working)
     {
-        cout << "The total number of workshops is less than the number of working workshops. Try again: ";
-        Get_positive_int(comp_workshops_working);
+        cout << "The total number of workshops is less than "
+            << "the number of working workshops. Try again: ";
+
+        comp_workshops_working = GetCorrectNumber(0);
     }
 
     cout << "Enter station class: ";
-    Get_positive_int(comp_station_class);
+    comp_station_class = GetCorrectNumber(0);
 
     cout << endl;
-
 }
 
 void Compressor_station::edit()
 {
-    int user_inp; //!!!
-    cout << "Total workshops:" << comp_workshops << endl;
-    cout << "Working workshops:" << comp_workshops_working << endl;
+    cout << "Total workshops: " << comp_workshops << endl;
+    cout << "Working workshops: " << comp_workshops_working << endl;
 
-    cout << "What do you want to do ?" << endl;
-    cout << "1.Start a workshop" << endl;
-    cout << "2.Stop a workshop" << endl;
-
+    cout << "What do you want to do?" << endl;
+    cout << "1. Start a workshop" << endl;
+    cout << "2. Stop a workshop" << endl;
     cout << "Enter: ";
-    Get_positive_int(user_inp);
 
+    int user_inp = GetCorrectNumber(0);
 
-    if (user_inp == 1 && (comp_workshops_working < comp_workshops))
+    if (user_inp == 1 && comp_workshops_working < comp_workshops)
     {
         Set_workings_workshops(comp_workshops_working + 1);
 
@@ -138,7 +142,8 @@ void Compressor_station::edit()
     }
 }
 
-std::ostream& operator<<(std::ostream& out, const Compressor_station& comp)
+std::ostream& operator<<(
+    std::ostream& out, const Compressor_station& comp)
 {
     out << comp.id << endl;
     out << std::quoted(comp.comp_name) << endl;
@@ -149,7 +154,8 @@ std::ostream& operator<<(std::ostream& out, const Compressor_station& comp)
     return out;
 }
 
-std::istream& operator>>(std::istream& in, Compressor_station& comp)
+std::istream& operator>>(
+    std::istream& in, Compressor_station& comp)
 {
     in >> comp.id;
     in >> std::quoted(comp.comp_name);

@@ -2,106 +2,42 @@
 #include "Utils.h"
 
 #include <iostream>
-#include <vector>
 #include <unordered_set>
 
 using namespace std;
 
-bool SelectIds(const unordered_set<int>& foundIds, vector<int>& selectedIds)
+unordered_set<int> SelectIds(const unordered_set<int>& foundIds)
 {
-    int selection;
+    cout << "\nSelect objects:\n1. All found objects\n"
+        << "2. Selected objects\n0. Cancel\nEnter: ";
 
-    do
-    {
-        cout << "\nSelect objects:" << endl;
-        cout << "1. All found objects" << endl;
-        cout << "2. Selected objects" << endl;
-        cout << "0. Cancel" << endl;
-        cout << "Enter: ";
+    int selection = GetCorrectNumber(0, 2);
 
-        Get_positive_int(selection);
+    if (selection == 0) return {};
+    if (selection == 1) return foundIds;
 
-        if (selection > 2)
-        {
-            cout << "Invalid option. Try again." << endl;
-        }
-    } while (selection > 2);
-
-    if (selection == 0)
-    {
-        return false;
-    }
-
-    selectedIds.clear();
-
-    if (selection == 1)
-    {
-        selectedIds.assign(foundIds.begin(), foundIds.end());
-        return true;
-    }
-
-    unordered_set<int> selectedSet;
-    int count;
+    unordered_set<int> selectedIds;
 
     while (true)
     {
-        cout << "How many objects do you want to select?"
-            << " (0 - Cancel): ";
-        Get_positive_int(count);
+        cout << "Enter object ID (0 - exit): ";
+        int id = GetCorrectNumber(0);
 
-        if (count == 0)
-        {
-            return false;
-        }
+        if (id == 0) break;
 
-        if (static_cast<size_t>(count) <= foundIds.size())
-        {
-            break;
-        }
-
-        cout << "Too many objects. Found: " << foundIds.size() << endl;
-    }
-
-    while (selectedIds.size() < static_cast<size_t>(count))
-    {
-        int id;
-        cout << "Enter object ID: ";
-        Get_positive_int(id);
-
-        if (foundIds.find(id) == foundIds.end())
-        {
+        if (!foundIds.contains(id))
             cout << "ID is not in the search results." << endl;
-            continue;
-        }
-
-        if (!selectedSet.insert(id).second)
-        {
+        else if (!selectedIds.insert(id).second)
             cout << "This ID has already been selected." << endl;
-            continue;
-        }
-
-        selectedIds.push_back(id);
     }
 
-    return true;
+    return selectedIds;
 }
 
 bool ConfirmDeletion()
 {
-    int confirmation;
-
-    do
-    {
-        cout << "Confirm deletion? (1 - Yes, 0 - No): ";
-        Get_positive_int(confirmation);
-
-        if (confirmation > 1)
-        {
-            cout << "Enter only 0 or 1." << endl;
-        }
-    } while (confirmation > 1);
-
-    return confirmation == 1;
+    cout << "Confirm deletion? (1 - Yes, 0 - No): ";
+    return GetCorrectNumber(0, 1) == 1;
 }
 
 void managePipes(unordered_map<int, Pipeline>& pipes)
@@ -112,8 +48,7 @@ void managePipes(unordered_map<int, Pipeline>& pipes)
         return;
     }
 
-    unordered_set<int> foundIds = findPipes(pipes);
-
+    auto foundIds = findPipes(pipes);
     if (foundIds.empty())
     {
         cout << "No pipes found" << endl;
@@ -121,42 +56,16 @@ void managePipes(unordered_map<int, Pipeline>& pipes)
     }
 
     cout << "\nFound pipes: " << foundIds.size() << endl;
+    for (int id : foundIds) pipes.at(id).print();
 
-    for (int id : foundIds)
-    {
-        pipes.at(id).print();
-    }
+    cout << "\nPipe management:\n1. Set under repair\n"
+        << "2. Remove from repair\n3. Delete pipes\n0. Back\nEnter: ";
 
-    int action;
+    int action = GetCorrectNumber(0, 3);
+    if (action == 0) return;
 
-    do
-    {
-        cout << "\nPipe management:" << endl;
-        cout << "1. Set under repair" << endl;
-        cout << "2. Remove from repair" << endl;
-        cout << "3. Delete pipes" << endl;
-        cout << "0. Back" << endl;
-        cout << "Enter: ";
-        Get_positive_int(action);
-
-        if (action > 3)
-        {
-            cout << "Invalid menu option. Try again." << endl;
-        }
-    } while (action > 3);
-
-    if (action == 0)
-    {
-        return;
-    }
-
-    vector<int> selectedIds;
-
-    if (!SelectIds(foundIds, selectedIds))
-    {
-        cout << "Operation canceled." << endl;
-        return;
-    }
+    auto selectedIds = SelectIds(foundIds);
+    if (selectedIds.empty()) return;
 
     if (action == 3 && !ConfirmDeletion())
     {
@@ -164,28 +73,13 @@ void managePipes(unordered_map<int, Pipeline>& pipes)
         return;
     }
 
-    int count = 0;
-
     for (int id : selectedIds)
     {
-        if (action == 1)
-        {
-            pipes.at(id).Set_condition(true);
-            count++;
-        }
-        else if (action == 2)
-        {
-            pipes.at(id).Set_condition(false);
-            count++;
-        }
-        else if (action == 3)
-        {
-            pipes.erase(id);
-            count++;
-        }
+        if (action == 3) pipes.erase(id);
+        else pipes.at(id).Set_condition(action == 1);
     }
 
-    cout << "Processed pipes: " << count << endl;
+    cout << "Processed pipes: " << selectedIds.size() << endl;
 }
 
 void manageCompressors(unordered_map<int, Compressor_station>& compressors)
@@ -196,8 +90,7 @@ void manageCompressors(unordered_map<int, Compressor_station>& compressors)
         return;
     }
 
-    unordered_set<int> foundIds = findCompressors(compressors);
-
+    auto foundIds = findCompressors(compressors);
     if (foundIds.empty())
     {
         cout << "No compressor stations found" << endl;
@@ -205,42 +98,17 @@ void manageCompressors(unordered_map<int, Compressor_station>& compressors)
     }
 
     cout << "\nFound compressor stations: " << foundIds.size() << endl;
+    for (int id : foundIds) compressors.at(id).print();
 
-    for (int id : foundIds)
-    {
-        compressors.at(id).print();
-    }
+    cout << "\nCompressor station management:\n1. Start a workshop\n"
+        << "2. Stop a workshop\n3. Delete compressor stations\n"
+        << "0. Back\nEnter: ";
 
-    int action;
+    int action = GetCorrectNumber(0, 3);
+    if (action == 0) return;
 
-    do
-    {
-        cout << "\nCompressor station management:" << endl;
-        cout << "1. Start a workshop" << endl;
-        cout << "2. Stop a workshop" << endl;
-        cout << "3. Delete compressor stations" << endl;
-        cout << "0. Back" << endl;
-        cout << "Enter: ";
-        Get_positive_int(action);
-
-        if (action > 3)
-        {
-            cout << "Invalid menu option. Try again." << endl;
-        }
-    } while (action > 3);
-
-    if (action == 0)
-    {
-        return;
-    }
-
-    vector<int> selectedIds;
-
-    if (!SelectIds(foundIds, selectedIds))
-    {
-        cout << "Operation canceled." << endl;
-        return;
-    }
+    auto selectedIds = SelectIds(foundIds);
+    if (selectedIds.empty()) return;
 
     if (action == 3 && !ConfirmDeletion())
     {
@@ -259,41 +127,14 @@ void manageCompressors(unordered_map<int, Compressor_station>& compressors)
             continue;
         }
 
-        Compressor_station& comp = compressors.at(id);
+        auto& comp = compressors.at(id);
 
-        if (action == 1)
-        {
-            if (comp.Get_workshops_working() < comp.Get_workshops())
-            {
-                if (comp.Set_workings_workshops(
-                    comp.Get_workshops_working() + 1))
-                {
-                    count++;
-                }
-            }
-            else
-            {
-                cout << "Station ID " << id
-                    << ": all workshops are already working." << endl;
-            }
-        }
-        else if (action == 2)
-        {
-            if (comp.Get_workshops_working() > 0)
-            {
-                if (comp.Set_workings_workshops(
-                    comp.Get_workshops_working() - 1))
-                {
-                    count++;
-                }
-            }
-            else
-            {
-                cout << "Station ID " << id
-                    << ": no working workshops." << endl;
-            }
-        }
+        if (comp.Set_workings_workshops(
+            comp.Get_workshops_working() + (action == 1 ? 1 : -1)))
+            count++;
+        else
+            cout << "Station ID " << id
+            << ": cannot change working workshops." << endl;
     }
-
     cout << "Processed compressor stations: " << count << endl;
 }

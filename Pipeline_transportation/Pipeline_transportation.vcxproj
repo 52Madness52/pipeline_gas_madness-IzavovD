@@ -153,6 +153,9 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Pipeline.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\x64\Debug\logging.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

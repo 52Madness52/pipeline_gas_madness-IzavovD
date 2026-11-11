@@ -1,4 +1,3 @@
-
 #include "Pipeline.h"
 #include "Compressor_station.h"
 #include "Utils.h"
@@ -13,7 +12,6 @@
 #include <chrono>
 
 using namespace std;
-
 
 void Menu_print()
 {
@@ -56,7 +54,7 @@ int main()
         Menu_print();
 
         cout << "Enter: ";
-        Get_positive_int(user_inp);
+        user_inp = GetCorrectNumber(0);
 
         switch (user_inp)
         {
@@ -136,12 +134,7 @@ int main()
                 cout << "0. Back" << endl;
                 cout << "Enter: ";
 
-                Get_positive_int(type);
-
-                if (type > 2)
-                {
-                    cout << "Invalid menu option. Try again." << endl;
-                }
+                type = GetCorrectNumber(0, 2);
 
             } while (type > 2);
 
