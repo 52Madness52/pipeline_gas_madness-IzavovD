@@ -150,6 +150,7 @@
     <ClInclude Include="Compressor_station.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="Manager.h" />
+    <ClInclude Include="Network.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Pipeline.h" />
   </ItemGroup>

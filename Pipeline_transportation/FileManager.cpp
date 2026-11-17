@@ -1,7 +1,7 @@
 #include "FileManager.h"
 #include <fstream>
 #include <iostream>
-
+#include <sstream>
 void FileManager::Save_Compressor(std::ostream& file, const Compressor_station& comp)
 {
     file << comp;
@@ -22,6 +22,7 @@ void FileManager::Upload_Pipeline(std::istream& file, Pipeline& pipe)
     file >> pipe;
 }
 
+
 bool FileManager::Save(
     const std::string& filename,
     const std::unordered_map<int, Pipeline>& pipes,
@@ -35,19 +36,13 @@ bool FileManager::Save(
         return false;
     }
 
-    file << pipes.size() << '\n';
-
     for (const auto& [id, pipe] : pipes)
-    {
         Save_Pipeline(file, pipe);
-    }
 
-    file << compressors.size() << '\n';
+    file << '\n';
 
     for (const auto& [id, comp] : compressors)
-    {
         Save_Compressor(file, comp);
-    }
 
     file.close();
 
@@ -58,7 +53,6 @@ bool FileManager::Save(
     }
 
     std::cout << "Data saved successfully." << std::endl;
-
     return true;
 }
 
@@ -78,68 +72,81 @@ bool FileManager::Load(
     std::unordered_map<int, Pipeline> loadedPipes;
     std::unordered_map<int, Compressor_station> loadedCompressors;
 
-    long long pipeCount;
+    bool readingPipes = true;
+    std::string line;
 
-    if (!(file >> pipeCount) || pipeCount < 0)
+    while (std::getline(file, line))
     {
-        std::cout << "Error: invalid pipe count." << std::endl;
-        return false;
-    }
-
-    for (long long i = 0; i < pipeCount; ++i)
-    {
-        Pipeline pipe;
-        Upload_Pipeline(file, pipe);
-
-        if (!file || pipe.Get_id() <= 0 ||
-            pipe.Get_length() < 0 || pipe.Get_diameter() < 0)
+        if (line.empty())
         {
-            std::cout << "Error: invalid pipe data." << std::endl;
-            return false;
+            if (!readingPipes)
+            {
+                std::cout << "Error: invalid file format." << std::endl;
+                return false;
+            }
+
+            readingPipes = false;
+            continue;
         }
 
-        if (!loadedPipes.emplace(pipe.Get_id(), pipe).second)
+        std::string data = line;
+
+        for (int i = 0; i < 4; i++)
         {
-            std::cout << "Error: duplicate pipe ID." << std::endl;
+            if (!std::getline(file, line) || line.empty())
+            {
+                std::cout << "Error: incomplete object data." << std::endl;
+                return false;
+            }
+
+            data += '\n' + line;
+        }
+
+        std::istringstream record(data);
+
+        if (readingPipes)
+        {
+            Pipeline pipe;
+
+            if (!(record >> pipe) ||
+                pipe.Get_id() <= 0 ||
+                pipe.Get_length() < 0 ||
+                pipe.Get_diameter() < 0 ||
+                !loadedPipes.emplace(pipe.Get_id(), pipe).second)
+            {
+                std::cout << "Error: invalid pipe data." << std::endl;
+                return false;
+            }
+        }
+        else
+        {
+            Compressor_station comp;
+
+            if (!(record >> comp) ||
+                comp.Get_id() <= 0 ||
+                comp.Get_workshops() < 0 ||
+                comp.Get_workshops_working() < 0 ||
+                comp.Get_workshops_working() > comp.Get_workshops() ||
+                comp.Get_station_class() < 0 ||
+                !loadedCompressors.emplace(comp.Get_id(), comp).second)
+            {
+                std::cout << "Error: invalid compressor data." << std::endl;
+                return false;
+            }
+        }
+
+        record >> std::ws;
+
+        if (!record.eof())
+        {
+            std::cout << "Error: invalid object format." << std::endl;
             return false;
         }
     }
 
-    long long compressorCount;
-
-    if (!(file >> compressorCount) || compressorCount < 0)
+    if (readingPipes || !file.eof())
     {
-        std::cout << "Error: invalid compressor count." << std::endl;
-        return false;
-    }
-
-    for (long long i = 0; i < compressorCount; ++i)
-    {
-        Compressor_station comp;
-        Upload_Compressor(file, comp);
-
-        if (!file || comp.Get_id() <= 0 ||
-            comp.Get_workshops() < 0 ||
-            comp.Get_workshops_working() < 0 ||
-            comp.Get_workshops_working() > comp.Get_workshops() ||
-            comp.Get_station_class() < 0)
-        {
-            std::cout << "Error: invalid compressor data." << std::endl;
-            return false;
-        }
-
-        if (!loadedCompressors.emplace(comp.Get_id(), comp).second)
-        {
-            std::cout << "Error: duplicate compressor ID." << std::endl;
-            return false;
-        }
-    }
-
-    file >> std::ws;
-
-    if (!file.eof())
-    {
-        std::cout << "Error: unexpected data at end of file." << std::endl;
+        std::cout << "Error: invalid file format." << std::endl;
         return false;
     }
 
@@ -147,6 +154,5 @@ bool FileManager::Load(
     compressors.swap(loadedCompressors);
 
     std::cout << "Data loaded successfully." << std::endl;
-
     return true;
 }

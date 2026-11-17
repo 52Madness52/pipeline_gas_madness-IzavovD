@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "Manager.h"
 #include "FileManager.h"
+#include "Network.h"
 
 #include <iostream>
 #include <fstream>
@@ -25,11 +26,12 @@ void Menu_print()
     cout << "0. Exit" << endl << endl;
 }
 
-
 int main()
 {
     unordered_map<int, Pipeline> pipes;
     unordered_map<int, Compressor_station> compressors;
+
+    GasNetwork network;
 
     string time = format("{:%d_%m_%Y_%H_%M_%S}",
         chrono::system_clock::now());
@@ -183,6 +185,4 @@ int main()
         }
 
     } while (user_inp != 0);
-
-    return 0;
 }
