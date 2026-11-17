@@ -142,6 +142,7 @@
     <ClCompile Include="Compressor_station.cpp" />
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="Manager.cpp" />
+    <ClCompile Include="Network.cpp" />
     <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="Pipeline_transportation.cpp" />
     <ClCompile Include="Utils.cpp" />

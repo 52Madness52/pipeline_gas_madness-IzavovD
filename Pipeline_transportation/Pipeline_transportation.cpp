@@ -23,6 +23,7 @@ void Menu_print()
     cout << "4. Search and manage objects" << endl;
     cout << "5. Save to file" << endl;
     cout << "6. Load from file" << endl;
+    cout << "7. Connect compressor stations" << endl;
     cout << "0. Exit" << endl << endl;
 }
 
@@ -149,6 +150,8 @@ int main()
                 manageCompressors(compressors);
             }
 
+            CleanupNetwork(network, pipes, compressors);
+
             break;
         }
 
@@ -171,8 +174,15 @@ int main()
             cout << "Enter filename to load: ";
             INPUT_LINE(cin, filename);
 
-            FileManager::Load(filename, pipes, compressors);
+            if (FileManager::Load(filename, pipes, compressors))
+                network.clear();
 
+            break;
+        }
+
+        case 7:
+        {
+            ConnectStations(network, pipes, compressors);
             break;
         }
 
