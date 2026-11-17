@@ -1,8 +1,9 @@
-
 #include "Network.h"
 #include "Utils.h"
 #include <iostream>
 
+#include <queue>
+#include <vector>
 using namespace std;
 
 int GetDiameter()
@@ -82,3 +83,52 @@ void CleanupNetwork(
         else
             ++it;
 }
+
+
+void TopologicalSort(
+    const GasNetwork& network,
+    const unordered_map<int, Compressor_station>& compressors)
+{
+    unordered_map<int, int> degree;
+    unordered_map<int, vector<int>> outgoing;
+
+    for (const auto& [id, comp] : compressors)
+        degree[id] = 0;
+
+    for (const auto& [pipeId, edge] : network)
+    {
+        outgoing[edge.from].push_back(edge.to);
+        ++degree[edge.to];
+    }
+
+    queue<int> ready;
+
+    for (const auto& [id, d] : degree)
+        if (d == 0)
+            ready.push(id);
+
+    vector<int> order;
+
+    while (!ready.empty())
+    {
+        int id = ready.front();
+        ready.pop();
+        order.push_back(id);
+
+        for (int to : outgoing[id])
+            if (--degree[to] == 0)
+                ready.push(to);
+    }
+
+    if (order.size() != compressors.size())
+    {
+        cout << "Cycle detected. Topological sorting is impossible." << endl;
+        return;
+    }
+
+    cout << "Topological order: ";
+    for (int id : order)
+        cout << id << " ";
+    cout << endl;
+}
+

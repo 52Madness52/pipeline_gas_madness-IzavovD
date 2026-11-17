@@ -24,6 +24,7 @@ void Menu_print()
     cout << "5. Save to file" << endl;
     cout << "6. Load from file" << endl;
     cout << "7. Connect compressor stations" << endl;
+    cout << "8. Topological sort" << endl;
     cout << "0. Exit" << endl << endl;
 }
 
@@ -183,6 +184,12 @@ int main()
         case 7:
         {
             ConnectStations(network, pipes, compressors);
+            break;
+        }
+
+        case 8:
+        {
+            TopologicalSort(network, compressors);
             break;
         }
 
